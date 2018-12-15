@@ -1,0 +1,42 @@
+# Selected Projects and Work
+A grab bag of things I'm proud to have worked on.
+
+This is probably too much detail...
+
+## Goodreads
+### Deals
+E-book Deals is a new (~ 1 year old) initiative at Goodreads that sends daily emails to subscribers with e-book deals of the day. I started on the team later in the project in order to help scale the nightly job that matches users to e-book deals after the project had moved to San Francisco and the project had be re-assigned to a new team.
+
+* At a process level advocate for spending ~ 20% time fixing techinical debt accumulated in order to launch
+* * Increase team morale and agency over the code base.
+
+* Advocate and architect DynamoDB table redesign in order to break up convoluted access patterns into separate tables
+* * Simplifies accesses at the service level decreasing amount of code needed to read and write to the main table, and increases performance in the main access pattern
+* * Replication handled by DynamoDB Streams + Lambda
+
+* Increased the teams confidence in evaluating and building on top of AWS services
+** Advocated for using big data tooling like Glue while on the team and built various small projects on the team (converting DynamoDB backups into parquet)
+** Once I left the team they were able to use Glue to significantly reduce compute time in the main deals matching job from 2 hours to 5 minutes.
+
+### Reviews Service
+This service is currently in production and powers all of the reviews functionality across all of Goodreads.com across various platforms. 
+
+* Rearchitected pre-production version of service from mixed MySQL and DynamoDB to a fully DynamoDB backed service.
+* * Reduced operations burden
+* * Service will scale in terms of storage and throughput without the need to swap database tier
+* * Built an object mapper to increase developer productivity.
+
+* Built a highly scalable, multi-process async job processing library on top of AWS Simple Queue Service in Ruby. It processes around a few Billion messages a month.
+* * Ran into a race condition in the Ruby AWS SDK, [filed an issue](https://github.com/aws/aws-sdk-ruby/issues/1438), and then decided to just [fix it](https://github.com/aws/aws-sdk-ruby/pull/1451).
+* * Learned a whole lot about how linux and process forking works.
+* * Originaly was written in JRuby and then converted to CRuby as Service converted runtimes. 
+
+* Designed project for searching all review text across Goodreads. Lead hackathon team to build production ready version in 3 days
+* * First production use case of Elasticsearch (via AWS Elasticsearch service) at Goodreads
+* * In production!
+
+### Other
+* Contributed to Go version of internal Amazon Remote Procedure Call (RPC) service framework
+* * Added codec to enable interoperability between Go and Ruby services
+* * Designed error handling in order to bring the framework up to standard and increase interoperability with other runtimes
+* * Designed (and soon to be implemented) logging interface to be more idiomatic and allow service owners to plug in their own logger

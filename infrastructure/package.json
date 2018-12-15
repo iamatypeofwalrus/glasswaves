@@ -15,6 +15,7 @@
     "aws-cdk": "^0.20.0"
   },
   "dependencies": {
+    "@aws-cdk/aws-certificatemanager": "^0.20.0",
     "@aws-cdk/cdk": "^0.20.0"
   }
 }

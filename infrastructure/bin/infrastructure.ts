@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 import cdk = require('@aws-cdk/cdk');
-import { InfrastructureStack } from '../lib/infrastructure-stack';
+import {CertsStack} from '../lib/certs-stack';
 
 const app = new cdk.App();
-new InfrastructureStack(app, 'InfrastructureStack');
+new CertsStack(app, "glasswaves-co-certs");
 app.run();

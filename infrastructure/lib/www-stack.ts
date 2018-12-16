@@ -20,5 +20,7 @@ export class WwwStack extends cdk.Stack {
       destinationBucketName: log.bucketName,
       logFilePrefix: "www/"
     };
+
+    www.export();
   }
 }

@@ -35,17 +35,9 @@ export class DeployStack extends cdk.Stack {
     // TODO: will eventually need permissions to make cloudfront changes
     buildRole.addToPolicy(
       new PolicyStatement()
-        .addAction("logs:CreateLogGroup")
-        .addAction("logs:CreateLogStream")
-        .addAction("logs:PutLogEvents")
-        .addResource(
-          new cdk.FnSub("arn:aws:logs:${AWS::Region}:${AWS::AccountId}:log-group:/aws/codebuild/*").toString()
-        )
-    );
-    buildRole.addToPolicy(
-      new PolicyStatement()
         // TODO: need a reference to the S3 bucket
         .addResource("arn:aws:s3:::glasswaves-co-www-cdk-wwwbucket57cb15e7-18997wjtgpbd8")
+        .addResource("arn:aws:s3:::glasswaves-co-www-cdk-wwwbucket57cb15e7-18997wjtgpbd8/*")
         // TODO: what are the minimum permissions needed to sync a bucket?
         .addAction("s3:*")
     );
@@ -60,10 +52,9 @@ export class DeployStack extends cdk.Stack {
         phases: {
           build: {
             commands: [
-              'echo Hello, CodeBuild!',
-              // TODO: how do I paramaterize this?
+              // TODO: how do I paramaterize this? or should this be defined in the source repo?
               // TODO: use aws s3 sync command in order to capture deleted items
-              'aws s3 cp ./www/src s3://glasswaves-co-www-cdk-wwwbucket57cb15e7-18997wjtgpbd8/ --recursive --cache-control max-age=86400'
+              'aws s3 sync ./www/src s3://glasswaves-co-www-cdk-wwwbucket57cb15e7-18997wjtgpbd8/ --cache-control max-age=86400'
             ]
           }
         }

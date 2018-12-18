@@ -16,6 +16,7 @@
   },
   "dependencies": {
     "@aws-cdk/aws-certificatemanager": "^0.20.0",
+    "@aws-cdk/aws-cloudfront": "^0.20.0",
     "@aws-cdk/aws-codebuild": "^0.20.0",
     "@aws-cdk/aws-codepipeline": "^0.20.0",
     "@aws-cdk/aws-iam": "^0.20.0",

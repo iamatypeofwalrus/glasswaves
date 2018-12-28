@@ -6,4 +6,4 @@ phases:
       - echo Hello, world!
   post_build:
     commands:
-    - aws s3 sync ./src/ s3://glasswaves-co-www-cdk-subdomainbucket86d45e8f-1gwp2y0qc8d8e --delete
+    - aws s3 sync www/src/ s3://glasswaves-co-www-cdk-subdomainbucket86d45e8f-1gwp2y0qc8d8e --delete

@@ -7,3 +7,5 @@ phases:
   post_build:
     commands:
     - aws s3 sync www/src/ s3://glasswaves-co-www-cdk-subdomainbucket86d45e8f-1gwp2y0qc8d8e --delete
+    - aws configure set preview.cloudfront true # not sure this line is needed anymore
+    - aws cloudfront create-invalidation --distribution-id E2VRGS96K8JHVB --paths /index.html

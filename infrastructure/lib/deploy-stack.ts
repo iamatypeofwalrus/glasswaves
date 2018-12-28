@@ -3,14 +3,30 @@ import codepipeline = require('@aws-cdk/aws-codepipeline');
 import codebuild = require('@aws-cdk/aws-codebuild');
 import { Role, ServicePrincipal, PolicyStatement } from '@aws-cdk/aws-iam';
 
+interface DeployStackProps extends cdk.StackProps {
+  staticBucketArn: string;
+  staticBucketName: string;
+  cloudfrontDistributionArn: string;
+  githubSourceProps: GithubSourceProps
+}
+
+interface GithubSourceProps {
+  owner: string,
+  repo: string,
+  buildSpecLocation: string
+}
+
 export class DeployStack extends cdk.Stack {
-  constructor(parent: cdk.App, name: string, props?: cdk.StackProps) {
+  constructor(parent: cdk.App, name: string, props: DeployStackProps) {
     super(parent, name, props);
     
+    // NOTE: using SSM since that's the default for cdk.Secret which is required by
+    // the GitHubSourceAction. I would prefer to use SecretsManager going forward.
+    // Open up a issue in CDK?
     let githubOathToken = new cdk.SecretParameter(this, "GithubOathToken", {
       ssmParameter: "GithubOathToken"
     })
-    let pipeline = new codepipeline.Pipeline(this, 'GlasswavesWwwPipeline');
+    let pipeline = new codepipeline.Pipeline(this, 'Pipeline');
 
     // Source Stage
     let sourceStage = pipeline.addStage('Source', {
@@ -18,51 +34,49 @@ export class DeployStack extends cdk.Stack {
         atIndex: 0
       }
     });
-    let sourceAction = new codepipeline.GitHubSourceAction(this, 'GlasswavesWwwGithubSource', {
+    let sourceAction = new codepipeline.GitHubSourceAction(this, 'Source', {
       stage: sourceStage,
-      owner: "iamatypeofwalrus",
-      repo: "glasswaves",
+      owner: props.githubSourceProps.owner,
+      repo: props.githubSourceProps.repo,
       oauthToken: githubOathToken.value,
       outputArtifactName: "SourceOutput"
     });
 
     // Build Stage
     let buildStage = pipeline.addStage('Build', {placement: {atIndex: 1}});
-    let buildRole = new Role(this, 'GlasswavesWwwBuildRole', {
+    let buildRole = new Role(this, 'BuildRole', {
       assumedBy: new ServicePrincipal('codebuild.amazonaws.com')
     })
 
-    // TODO: will eventually need permissions to make cloudfront changes
     buildRole.addToPolicy(
       new PolicyStatement()
-        // TODO: need a reference to the S3 bucket
-        .addResource("arn:aws:s3:::glasswaves-co-www-cdk-wwwbucket57cb15e7-18997wjtgpbd8")
-        .addResource("arn:aws:s3:::glasswaves-co-www-cdk-wwwbucket57cb15e7-18997wjtgpbd8/*")
-        // TODO: what are the minimum permissions needed to sync a bucket?
-        .addAction("s3:*")
+        .addResource(props.staticBucketArn)
+        .addResource(`${props.staticBucketArn}/*`)
+        .addAction("s3:ListBucket")
+        .addAction("s3:GetObject")
+        .addAction("s3:GetBucketLocation")
+        .addAction("s3:PutObject")
+        .addAction("s3:DeleteObject")
     );
 
-    let buildProject = new codebuild.Project(this, 'GlasswavesWwwBuild', {
+    buildRole.addToPolicy(
+      new PolicyStatement()
+        // TODO: try to narrow this down to the specific cloudfront distribution
+        .addResource("*")
+        .addAction("cloudfront:CreateInvalidation")
+    )
+
+    let buildProject = new codebuild.Project(this, 'Build', {
       environment: {
         computeType: codebuild.ComputeType.Small,
         buildImage: codebuild.LinuxBuildImage.UBUNTU_14_04_NODEJS_8_11_0
       },
-      buildSpec: {
-        version: "0.2",
-        phases: {
-          build: {
-            commands: [
-              // TODO: how do I paramaterize this? or should this be defined in the source repo?
-              // TODO: use aws s3 sync command in order to capture deleted items
-              'aws s3 sync ./www/src s3://glasswaves-co-www-cdk-wwwbucket57cb15e7-18997wjtgpbd8/ --cache-control max-age=86400'
-            ]
-          }
-        }
-      },
       source: new codebuild.CodePipelineSource(),
+      buildSpec: props.githubSourceProps.buildSpecLocation,
       role: buildRole
     });
-    new codebuild.PipelineBuildAction(this, 'GlasswavesWwwBuildAction', {
+
+    new codebuild.PipelineBuildAction(this, 'BuildAction', {
       project: buildProject,
       stage: buildStage,
       inputArtifact: sourceAction.outputArtifact

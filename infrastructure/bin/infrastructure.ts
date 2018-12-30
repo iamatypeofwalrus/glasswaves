@@ -1,19 +1,26 @@
 #!/usr/bin/env node
-import cdk = require('@aws-cdk/cdk');
-import {CertsStack} from '../lib/certs-stack';
-import {WwwStack} from '../lib/www-stack';
-import {DeployStack} from '../lib/deploy-stack';
+import cdk = require('@aws-cdk/cdk')
+import {CertsStack} from '../lib/certs-stack'
+import {WwwStack} from '../lib/www-stack'
+import {DeployStack} from '../lib/deploy-stack'
+import { BaseStack } from '../lib/base-stack'
 
-const app = new cdk.App();
-const certs = new CertsStack(app, "glasswaves-co-certs");
+const app = new cdk.App()
+
+new CertsStack(app, "glasswaves-co-certs", {env: {region: "us-east-1"}})
+
+const base = new BaseStack(app, "glasswaves-co")
+
 const www = new WwwStack(app, "glasswaves-co-www", {
   domain: "glasswaves.co",
   subdomain: "www",
   redirectFromRoot: true,
-  // TODO this should be in a stack, not hardcoded out here
-  hostedZoneId: "Z1J23IWSWEJW4B",
-  certificateArn: certs.certificateRef.certificateArn
-});
+  hostedZoneId: base.hostedZoneRef.hostedZoneId, 
+  subdomainCertificateArn: base.wwwCertRef.certificateArn,
+  domainCertificateArn: base.nakedCertRef.certificateArn,
+  logBucketRef: base.logBucketRef
+})
+
 new DeployStack(app, "glasswaves-co-www-deploy", {
   staticBucketArn: www.subdomainBucketRef.bucketArn as string,
   staticBucketName: www.subdomainBucketRef.bucketName as string,
@@ -25,5 +32,6 @@ new DeployStack(app, "glasswaves-co-www-deploy", {
     repo: "glasswaves",
     buildSpecLocation: "www/buildspec.yml"
   }
-});
-app.run();
+})
+
+app.run()

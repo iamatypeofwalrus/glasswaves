@@ -1,17 +1,24 @@
 import cdk = require('@aws-cdk/cdk');
-import { Certificate, CertificateRefProps } from '@aws-cdk/aws-certificatemanager';
+import { Certificate } from '@aws-cdk/aws-certificatemanager';
 
-export class CertsStack extends cdk.Stack {
-  public readonly certificateRef: CertificateRefProps
-  
+// As of the end of 2018 CloudFront distributions only work with ACM certificates
+// that are created in us-east-1. This stack creates certificates for Glasswaves 
+// that can be used by CloudFront and thus can only be deployed in us-east-1.
+// 
+// Notes:
+// * Each certificate is exported so it's convinient to grab its ARN
+// * Each certificate ARN should be imported in the glasswaves-co base stack and exported
+//   so the appropriate stack can comsume it
+export class CertsStack extends cdk.Stack {  
   constructor(parent: cdk.App, name: string, props?: cdk.StackProps) {
     super(parent, name, props);
 
-    // TODO: create a new certificate that's built into CDK.
-    let cert = Certificate.import(this, "GlasswavesCert", {
-      certificateArn: "arn:aws:acm:us-east-1:081732485147:certificate/8d9a3dae-e8d4-44a8-ad59-a34291aca1aa"
-    });
+    new Certificate(this, "GlasswavesCoCert", {
+      domainName: "glasswaves.co"
+    }).export()
 
-    this.certificateRef = cert.export()
+    new Certificate(this, "WwwCert", {
+      domainName: "www.glasswaves.co"
+    }).export()
   }
 }

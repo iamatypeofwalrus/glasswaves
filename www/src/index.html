@@ -8,13 +8,10 @@
 		<link rel="stylesheet" href="public/css/glasswaves.css" />
 	</head>
 	<body>
-		<div class="container feeney">
-			<div class="row">
-				<div class="col-sm-4">
-					<img src="public/ely-tristan-me.jpg" class="img-fluid img-thumbnail" />
-				</div>
-				<div class="col-sm">
-					<h2>Hey, I'm Joe Feeney</h2>
+		<div class="container">
+			<div class="text-center">
+				<h2>Hey, I'm Joe Feeney</h2>
+				<p>
 					<small>
 						<a href="https://www.linkedin.com/in/joseph-feeney-b77b9251">LinkedIn</a>
 						*
@@ -24,28 +21,34 @@
 						*
 						<a href="selected_projects.txt">Selected Projects</a>
 					</small>
-					<br>
-					<br>
-					<p>
-						I love me some
-						<a href="https://github.com/iamatypeofwalrus/logspout-loggly">Golang</a>,
-						<a href="https://github.com/aws/aws-sdk-ruby/pull/1451">Ruby</a>, and 
-						<a href="https://aws.amazon.com/blogs/big-data/how-goodreads-offloads-amazon-dynamodb-tables-to-amazon-s3-and-queries-them-using-amazon-athena/">AWS</a>.
-						<br>
-						<br> I'm currently working at Amazon Go on secret stuff.
-						<br>
-						<br> I also build and modify guitars. Poorly.
-					</p>
-					<small>
-						<a href="https://github.com/iamatypeofwalrus/glasswaves">This website</a> is handcrafted HTML backed by
-						<a href="https://aws.amazon.com/s3/">S3</a>
-						+
-						<a href="https://aws.amazon.com/cloudfront/">Cloudfront</a>, deployed with CodePipelines, and modeled with
-						<a href="https://aws.amazon.com/cloudformation/">Cloudformation</a>.
-					</small>
-					<br>
-				</div>
+				</p>
+				<img src="public/ely-tristan-me.jpg" class="rounded" alt="young family"/>
+				<br>
+				<br>
+				<p>
+					I'm currently working on secret stuff at Amazon Go.
+					<br><br>
+					You can usually find me tinkering on
+					<a href="https://aws.amazon.com/blogs/big-data/how-goodreads-offloads-amazon-dynamodb-tables-to-amazon-s3-and-queries-them-using-amazon-athena/">AWS</a>,
+					<a href="https://github.com/iamatypeofwalrus/shim">Golang</a>,
+					<a href="https://github.com/aws/aws-sdk-ruby/pull/1451">Ruby</a>,
+					Java,
+					and <a href="https://github.com/iamatypeofwalrus/glasswaves/tree/master/infrastructure">Typescript</a> projects when
+					I'm not playing or modifying guitars.
+				</p>
 			</div>
 		</div>
+		<footer class="footer">
+			<div class="container fixed-bottom card-footer">
+				<small>
+					<a href="https://github.com/iamatypeofwalrus/glasswaves">This website</a> is handcrafted, artisinal HTML backed by
+					<a href="https://aws.amazon.com/cloudfront/">CloudFront</a>
+					+
+					<a href="https://aws.amazon.com/s3/">S3</a>
+					, continuously deployed with <a href="https://aws.amazon.com/codepipeline/">CodePipeline</a>
+					, and modeled with the <a href="https://github.com/awslabs/aws-cdk">Cloud Development Kit</a> in <a href="https://www.typescriptlang.org">Typescript</a>.
+				</small>
+			</div>
+		</footer>
 	</body>
 </html>

@@ -1,8 +1,8 @@
 #!/usr/bin/env node
-import cdk = require('@aws-cdk/cdk')
-import {CertsStack} from '../lib/certs-stack'
-import {WwwStack} from '../lib/www-stack'
-import {DeployStack} from '../lib/deploy-stack'
+import cdk = require('@aws-cdk/core')
+import { CertsStack } from '../lib/certs-stack'
+import { WwwStack } from '../lib/www-stack'
+import { DeployStaticWebsiteStack } from '../lib/deploy-static-website-stack'
 import { BaseStack } from '../lib/base-stack'
 
 const app = new cdk.App()
@@ -15,23 +15,20 @@ const www = new WwwStack(app, "glasswaves-co-www", {
   domain: "glasswaves.co",
   subdomain: "www",
   redirectFromRoot: true,
-  hostedZoneId: base.hostedZoneRef.hostedZoneId, 
-  subdomainCertificateArn: base.wwwCertRef.certificateArn,
-  domainCertificateArn: base.nakedCertRef.certificateArn,
-  logBucketRef: base.logBucketRef
+  hostedZone: base.hostedZone,
+  subdomainCertificate: base.wwwCert,
+  domainCertificate: base.nakedCert,
+  logBucket: base.logBucket
 })
 
-new DeployStack(app, "glasswaves-co-www-deploy", {
-  staticBucketArn: www.subdomainBucketRef.bucketArn as string,
-  staticBucketName: www.subdomainBucketRef.bucketName as string,
-  // TODO this should be resolvable from WwwStack,however I get this error:
-  // Unresolved resource dependencies [SubdomainDistributionCFDistributionC530BCE6]
-  cloudfrontDistributionArn: "arn:aws:cloudfront::081732485147:distribution/E1D5NVFADA98AR",
+new DeployStaticWebsiteStack(app, "glasswaves-co-www-deploy", {
+  staticBucket: www.subdomainBucket,
   githubSourceProps: {
     owner: "iamatypeofwalrus",
     repo: "glasswaves",
-    buildSpecLocation: "www/buildspec.yml"
+    buildSpecLocation: "www/buildspec.yml",
+    oathTokenSecretArn: "arn:aws:secretsmanager:us-west-2:081732485147:secret:GithubOathToken-WWDJjO"
   }
 })
 
-app.run()
+app.synth()

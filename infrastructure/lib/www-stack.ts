@@ -1,96 +1,106 @@
-import cdk = require('@aws-cdk/cdk');
+import cdk = require('@aws-cdk/core');
 import s3 = require('@aws-cdk/aws-s3');
 import cloudfront = require('@aws-cdk/aws-cloudfront');
 import route53 = require('@aws-cdk/aws-route53');
-import { BucketRefProps } from '@aws-cdk/aws-s3';
-import { HostedZoneRef } from '@aws-cdk/aws-route53';
-import { ViewerProtocolPolicy, OriginProtocolPolicy } from '@aws-cdk/aws-cloudfront';
+import { ICertificate } from '@aws-cdk/aws-certificatemanager';
+import { OriginProtocolPolicy, ViewerProtocolPolicy } from '@aws-cdk/aws-cloudfront';
+import { HostedZone, RecordTarget } from '@aws-cdk/aws-route53';
 
 interface WwwStackProps extends cdk.StackProps {
-  domain: string;
-  subdomain: string;
-  subdomainCertificateArn: string;
-  domainCertificateArn: string;
-  hostedZoneId: string;
-  logBucketRef: BucketRefProps;
+  domain: string; // e.g. glasswaves.co
+  subdomain: string; // e.g. www
+  hostedZone: HostedZone;
+  subdomainCertificate: ICertificate;
+  logBucket: s3.Bucket
   redirectFromRoot?: boolean;
+  domainCertificate?: ICertificate;
 }
 
+// WwwStack is an opionated stack for static websites.
 export class WwwStack extends cdk.Stack {
-  public readonly subdomainBucketRef: BucketRefProps
-  public readonly subdomainDistributionId: string
+  public readonly subdomainBucket: s3.Bucket
+  public readonly subdomainDistribution: cloudfront.CloudFrontWebDistribution
 
   constructor(parent: cdk.App, name: string, props: WwwStackProps) {
     super(parent, name, props);
 
-    const log = s3.Bucket.import(this, 'LogsBucket', props.logBucketRef)
-    const subdomainBucket = this.createWebsiteBucket(props.subdomain, props.domain, log.bucketName)
-    this.subdomainBucketRef = subdomainBucket.export();
+    this.subdomainBucket = this.createSubdomainBucket(props.subdomain, props.domain, props.logBucket)
 
-    const subdomainDist = this.createWebsiteCloudFrontDist(subdomainBucket, log, props.subdomainCertificateArn, props.subdomain, props.domain)
+    this.subdomainDistribution = this.createSubdomainCloudFrontDist(
+      this.subdomainBucket,
+      props.logBucket,
+      props.subdomainCertificate,
+      props.subdomain,
+      props.domain
+    )
 
-    // TODO: this isn't working as the cloudfront distribution is not exportable @ 0.20.0
-    this.subdomainDistributionId = subdomainDist.distributionId
-
-    const zone = HostedZoneRef.import(this, "SubdomainHostedZone", {
-      zoneName: props.domain,
-      hostedZoneId: props.hostedZoneId
-    })
-
-    new route53.AliasRecord(zone, "SubdomainRecordSet", {
+    new route53.ARecord(this, "SubdomainRecordSet", {
+      zone: props.hostedZone,
       recordName: `${props.subdomain}.${props.domain}.`,
-      target: subdomainDist
+      target: RecordTarget.fromValues(`${props.subdomain}.${props.domain}.`)
     })
 
-    if (props.redirectFromRoot) {
-      const rootBucket = this.createRootBucket(props.subdomain, props.domain, log.bucketName)
-      const rootDist = this.createRootCloudFrontDist(rootBucket, props.domain, log, props.domainCertificateArn)
-      new route53.AliasRecord(zone, "RootRecordSet", {
+    if (props.redirectFromRoot && props.domainCertificate) {
+      const rootBucket = this.createRootBucket(props.subdomain, props.domain, props.logBucket)
+      const rootDist = this.createRootCloudFrontDist(rootBucket, props.domain, props.logBucket, props.domainCertificate)
+      new route53.ARecord(this, "RootRecordSet", {
+        zone: props.hostedZone,
         recordName: `${props.domain}.`,
-        target: rootDist
+        target: RecordTarget.fromValues(rootDist.domainName)
       })
     }
   }
 
-  createWebsiteBucket(subdomain: string, domain: string, logBucketName: string): s3.Bucket {
-    let bucket = new s3.Bucket(this, `SubdomainBucket`);
+  // Create a Subdomain bucket that hosts some resources
+  createSubdomainBucket(subdomain: string, domain: string, logBucket: s3.Bucket): s3.Bucket {
+    let bucket = new s3.Bucket(this, `SubdomainBucket`)
     bucket.grantPublicAccess()
-    let bucketResource = bucket.findChild('Resource') as s3.cloudformation.BucketResource;
-    bucketResource.propertyOverrides.websiteConfiguration = {
+
+    let cfnBucket = bucket.node.defaultChild as s3.CfnBucket
+    cfnBucket.websiteConfiguration = {
       indexDocument: "index.html",
       errorDocument: "404.html"
     };
-    bucketResource.propertyOverrides.loggingConfiguration = {
-      destinationBucketName: logBucketName,
+
+    cfnBucket.loggingConfiguration = {
+      destinationBucketName: logBucket.bucketName,
       logFilePrefix: `bucket-access/${subdomain}.${domain}/`
     };
 
     return bucket
   }
 
-  createRootBucket(subdomain: string, domain: string, logBucketName: string): s3.Bucket {
+  // create a root bucket that serves as a redirect bucket to subdomain.domain
+  createRootBucket(subdomain: string, domain: string, logBucket: s3.Bucket): s3.Bucket {
     let bucket = new s3.Bucket(this, "RootBucket");
     bucket.grantPublicAccess()
 
-    let bucketResource = bucket.findChild('Resource') as s3.cloudformation.BucketResource
-    bucketResource.propertyOverrides.websiteConfiguration = {
+    let cfnBucket = bucket.node.defaultChild as s3.CfnBucket
+    cfnBucket.websiteConfiguration = {
       redirectAllRequestsTo: {
         hostName: `${subdomain}.${domain}`,
         protocol: "https"
       }
     }
-    bucketResource.propertyOverrides.loggingConfiguration = {
-      destinationBucketName: logBucketName,
+
+    cfnBucket.loggingConfiguration = {
+      destinationBucketName: logBucket.bucketName,
       logFilePrefix: `bucket-access/${domain}/`
     }
 
     return bucket
   }
 
-  createWebsiteCloudFrontDist(source: s3.Bucket, logBucket: s3.BucketRef, certificateArn?: string, subdomain?: string, domain?: string): cloudfront.CloudFrontWebDistribution {
-    let cloudfrontProps: cloudfront.CloudFrontWebDistributionProps = {
+  createSubdomainCloudFrontDist(source: s3.Bucket, logBucket: s3.Bucket, certificate: ICertificate, subdomain?: string, domain?: string): cloudfront.CloudFrontWebDistribution {
+    return new cloudfront.CloudFrontWebDistribution(this, 'SubdomainDistribution', {
       comment: "Distribution pointing to the subdomain bucket",
-      priceClass: cloudfront.PriceClass.PriceClassAll,
+      priceClass: cloudfront.PriceClass.PRICE_CLASS_ALL,
+      aliasConfiguration: {
+        acmCertRef: certificate.certificateArn,
+        names: [
+          `${subdomain}.${domain}`
+        ]
+      },
       errorConfigurations: [
         {
           errorCode: 404,
@@ -122,29 +132,20 @@ export class WwwStack extends cdk.Stack {
         bucket: logBucket,
         prefix: `cloudfront/${subdomain}.${domain}/`
       }
-    }
-
-    if (!!certificateArn) {
-      cloudfrontProps.aliasConfiguration = {
-        acmCertRef: certificateArn,
-        names: [
-          `${subdomain}.${domain}`
-        ]
-      }
-    }
-
-    return new cloudfront.CloudFrontWebDistribution(this, 'SubdomainDistribution', cloudfrontProps);
+    });
   }
 
-  createRootCloudFrontDist(source: s3.Bucket, domain: string, logBucket: s3.BucketRef, certificateArn?: string): cloudfront.CloudFrontWebDistribution {
-    // Ideally, this should be on the S3 Bucket resource itself rather than having to construct it here
-    let region = new cdk.AwsRegion()
-    let domainName = `${source.bucketName}.s3-website-${region.toString()}.amazonaws.com`
-
-    let props: cloudfront.CloudFrontWebDistributionProps = {
+  createRootCloudFrontDist(source: s3.Bucket, domain: string, logBucket: s3.Bucket, certificate: ICertificate): cloudfront.CloudFrontWebDistribution {
+    return new cloudfront.CloudFrontWebDistribution(this, "RootDistribution", {
       comment: `Distributions pointing to the root bucket of ${domain}`,
-      priceClass: cloudfront.PriceClass.PriceClassAll,
-      viewerProtocolPolicy: ViewerProtocolPolicy.AllowAll,
+      priceClass: cloudfront.PriceClass.PRICE_CLASS_ALL,
+      viewerProtocolPolicy: ViewerProtocolPolicy.ALLOW_ALL,
+      aliasConfiguration: {
+        acmCertRef: certificate.certificateArn,
+        names: [
+          domain
+        ]
+      },
       // the default for defaultRootObject is index.html which causes issues with the redirect bucket.
       // e.g. naked domain + https redirects to www.domain.com/index.html which isn't quite right.
       defaultRootObject: "",
@@ -154,31 +155,20 @@ export class WwwStack extends cdk.Stack {
       originConfigs: [
         {
           customOriginSource: {
-            domainName: domainName,
-            originProtocolPolicy: OriginProtocolPolicy.HttpOnly
+            domainName: source.bucketWebsiteUrl,
+            originProtocolPolicy: OriginProtocolPolicy.HTTP_ONLY
           },
           behaviors: [
             {
               isDefaultBehavior: true
             }
           ]
-        }  
+        }
       ],
       loggingConfig: {
         bucket: logBucket,
         prefix: `cloudfront/${domain}/`
       }
-    }
-
-    if (!!certificateArn) {
-      props.aliasConfiguration = {
-        acmCertRef: certificateArn,
-        names: [
-          domain
-        ]
-      }
-    }
-
-    return new cloudfront.CloudFrontWebDistribution(this, "RootDistribution", props)
+    })
   }
 }

@@ -56,7 +56,7 @@ export class StaticWebsiteStack extends cdk.Stack {
   }
 
   // Create a Subdomain bucket that hosts some resources
-  createSubdomainBucket(subdomain: string, domain: string, logBucket: s3.Bucket): s3.Bucket {
+  private createSubdomainBucket(subdomain: string, domain: string, logBucket: s3.Bucket): s3.Bucket {
     let bucket = new s3.Bucket(this, `SubdomainBucket`)
     bucket.grantPublicAccess()
 
@@ -75,7 +75,7 @@ export class StaticWebsiteStack extends cdk.Stack {
   }
 
   // create a root bucket that serves as a redirect bucket to subdomain.domain
-  createRootBucket(subdomain: string, domain: string, logBucket: s3.Bucket): s3.Bucket {
+  private createRootBucket(subdomain: string, domain: string, logBucket: s3.Bucket): s3.Bucket {
     let bucket = new s3.Bucket(this, "RootBucket");
     bucket.grantPublicAccess()
 
@@ -95,7 +95,7 @@ export class StaticWebsiteStack extends cdk.Stack {
     return bucket
   }
 
-  createSubdomainCloudFrontDist(source: s3.Bucket, logBucket: s3.Bucket, certificate: ICertificate, subdomain?: string, domain?: string): cloudfront.CloudFrontWebDistribution {
+  private createSubdomainCloudFrontDist(source: s3.Bucket, logBucket: s3.Bucket, certificate: ICertificate, subdomain?: string, domain?: string): cloudfront.CloudFrontWebDistribution {
     return new cloudfront.CloudFrontWebDistribution(this, 'SubdomainDistribution', {
       comment: "Distribution pointing to the subdomain bucket",
       priceClass: cloudfront.PriceClass.PRICE_CLASS_ALL,
@@ -139,7 +139,7 @@ export class StaticWebsiteStack extends cdk.Stack {
     });
   }
 
-  createRootCloudFrontDist(source: s3.Bucket, domain: string, logBucket: s3.Bucket, certificate: ICertificate): cloudfront.CloudFrontWebDistribution {
+  private createRootCloudFrontDist(source: s3.Bucket, domain: string, logBucket: s3.Bucket, certificate: ICertificate): cloudfront.CloudFrontWebDistribution {
     return new cloudfront.CloudFrontWebDistribution(this, "RootDistribution", {
       comment: `Distributions pointing to the root bucket of ${domain}`,
       priceClass: cloudfront.PriceClass.PRICE_CLASS_ALL,

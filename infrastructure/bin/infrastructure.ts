@@ -23,6 +23,7 @@ const www = new StaticWebsiteStack(app, "glasswaves-co-www", {
 
 new DeployStaticWebsiteStack(app, "glasswaves-co-www-deploy", {
   staticBucket: www.subdomainBucket,
+  cloudfrontDist: www.subdomainDistribution,
   githubSourceProps: {
     owner: "iamatypeofwalrus",
     repo: "glasswaves",

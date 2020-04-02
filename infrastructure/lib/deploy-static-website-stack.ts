@@ -6,9 +6,11 @@ import { PolicyStatement, Role, ServicePrincipal } from '@aws-cdk/aws-iam';
 import { Bucket } from '@aws-cdk/aws-s3';
 import { SecretValue } from '@aws-cdk/core';
 import codebuild = require('@aws-cdk/aws-codebuild');
+import { CloudFrontWebDistribution } from '@aws-cdk/aws-cloudfront';
 
 interface DeployStaticWebsiteStackProps extends cdk.StackProps {
-  staticBucket: Bucket;
+  staticBucket: Bucket
+  cloudfrontDist: CloudFrontWebDistribution
   githubSourceProps: GithubSourceProps
 }
 
@@ -73,7 +75,17 @@ export class DeployStaticWebsiteStack extends cdk.Stack {
             new CodeBuildAction({
               actionName: 'build-and-deploy',
               project: sourceBuild,
-              input: sourceOutput
+              input: sourceOutput,
+              environmentVariables: {
+                "S3_BUCKET_NAME": {
+                  type: codebuild.BuildEnvironmentVariableType.PLAINTEXT,
+                  value: props.staticBucket.bucketName
+                },
+                "CLOUDFRONT_ID": {
+                  type: codebuild.BuildEnvironmentVariableType.PLAINTEXT,
+                  value: props.cloudfrontDist.distributionId
+                }
+              }
             })
           ]
         }

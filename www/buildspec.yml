@@ -2,8 +2,8 @@ version: 0.2
 phases:
   build:
     commands:
-    - echo "Static Website Bucket: $S3_BUCKET_NAME"
-    - echo "CloudFront Distribution ID: $CLOUDFRONT_ID"
+    - echo "Static Website Bucket -> $S3_BUCKET_NAME"
+    - echo "CloudFront Distribution ID -> $CLOUDFRONT_ID"
   post_build:
     commands:
     - aws s3 sync www/src/ s3://$S3_BUCKET_NAME --delete

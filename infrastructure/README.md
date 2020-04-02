@@ -1,9 +1,18 @@
 # Glasswaves Infrastructure
 
 ## Prequisites
-* Github Oath token stored in SSM
+* Github personal access Oath token stored in Secrets Manager in us-west-2
+
+## Development
+### Add a new CDK library
+e.g.
+```sh
+npm install --save @aws-cdk/aws-route53-targets@1.1.0
+```
 
 ## Deploying
+### List stacks
+`cdk list`
 ### Deploying all stacks
 `cdk deploy`
 

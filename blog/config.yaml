@@ -1,0 +1,9 @@
+baseURL: "http://glasswaves.co/"
+languageCode: "en-us"
+title: "Glasswaves Co"
+theme: "noteworthy"
+
+params:
+  twitter: "https://twitter.com/iamsomewalrus"
+  linkedin: "https://www.linkedin.com/in/joseph-feeney/"
+  github: "https://github.com/iamatypeofwalrus"

@@ -1,0 +1,13 @@
+---
+version: 0.2
+phases:
+  pre_build:
+    commands:
+    - echo install hugo
+  build:
+    commands:
+    - echo hugo build
+  post_build:
+    commands:
+    - echo hugo deploy
+

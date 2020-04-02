@@ -1,13 +1,12 @@
 ---
-# TODO bucket and cloudfront ID should be provided via environment variables
 version: 0.2
 phases:
   build:
     commands:
-      - echo $S3_BUCKET_NAME
-      - echo $CLOUDFRONT_ID
+      - echo Static Website Bucket: $S3_BUCKET_NAME
+      - echo CloudFront Distribution ID: $CLOUDFRONT_ID
   post_build:
     commands:
-    - aws s3 sync www/src/ s3://glasswaves-co-www-subdomainbucket86d45e8f-1i4zlpu0znz1d --delete
+    - aws s3 sync www/src/ s3://$S3_BUCKET_NAME --delete
     - aws configure set preview.cloudfront true # not sure this line is needed anymore
-    - aws cloudfront create-invalidation --distribution-id E2MOATU1FTM843  --paths "/*"
+    - aws cloudfront create-invalidation --distribution-id $CLOUDFRONT_ID --paths "/*"

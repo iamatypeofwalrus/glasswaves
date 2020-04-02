@@ -1,13 +1,28 @@
 ---
 version: 0.2
+
+environment_variables:
+  plaintext:
+    HUGO_VERSION: "0.68.3"
+
 phases:
+  install:
+    commands:
+    - echo installing hugo at $HUGO_VERSION
+    - curl -Ls https://github.com/gohugoio/hugo/releases/download/v${HUGO_VERSION}/hugo_${HUGO_VERSION}_Linux-64bit.tar.gz -o /tmp/hugo.tar.gz
+    - tar -zxf /tmp/hugo.tar.gz -C /tmp
+    - mv /tmp/hugo /usr/bin/hugo
   pre_build:
     commands:
-    - echo install hugo
+    - echo Hugo Config
+    - cat config.yaml
+    - echo Pulling themes
+    - git submodule update --init --recursive
   build:
     commands:
-    - echo hugo build
+    - hugo -v
   post_build:
     commands:
-    - echo hugo deploy
+    - echo Deploying to S3
+    - hugo deploy
 

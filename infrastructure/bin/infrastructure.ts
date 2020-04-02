@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 import cdk = require('@aws-cdk/core')
 import { CertsStack } from '../lib/certs-stack'
-import { WwwStack } from '../lib/www-stack'
+import { StaticWebsiteStack } from '../lib/static-website-stack'
 import { DeployStaticWebsiteStack } from '../lib/deploy-static-website-stack'
 import { BaseStack } from '../lib/base-stack'
 
@@ -11,7 +11,7 @@ new CertsStack(app, "glasswaves-co-certs", {env: {region: "us-east-1"}})
 
 const base = new BaseStack(app, "glasswaves-co")
 
-const www = new WwwStack(app, "glasswaves-co-www", {
+const www = new StaticWebsiteStack(app, "glasswaves-co-www", {
   domain: "glasswaves.co",
   subdomain: "www",
   redirectFromRoot: true,

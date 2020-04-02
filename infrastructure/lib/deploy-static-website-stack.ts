@@ -71,7 +71,7 @@ export class DeployStaticWebsiteStack extends cdk.Stack {
           stageName: 'Build',
           actions: [
             new CodeBuildAction({
-              actionName: 'Glasswaves Build and Deploy',
+              actionName: 'build-and-deploy',
               project: sourceBuild,
               input: sourceOutput
             })

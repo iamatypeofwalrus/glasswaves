@@ -1,12 +1,12 @@
 import cdk = require('@aws-cdk/core');
 import s3 = require('@aws-cdk/aws-s3');
 import cloudfront = require('@aws-cdk/aws-cloudfront');
-import route53 = require('@aws-cdk/aws-route53');
 import { ICertificate } from '@aws-cdk/aws-certificatemanager';
 import { OriginProtocolPolicy, ViewerProtocolPolicy } from '@aws-cdk/aws-cloudfront';
-import { HostedZone, RecordTarget } from '@aws-cdk/aws-route53';
+import { ARecord, HostedZone, RecordTarget } from '@aws-cdk/aws-route53';
+import { CloudFrontTarget } from '@aws-cdk/aws-route53-targets';
 
-interface WwwStackProps extends cdk.StackProps {
+interface StaticWebsiteStackProps extends cdk.StackProps {
   domain: string; // e.g. glasswaves.co
   subdomain: string; // e.g. www
   hostedZone: HostedZone;
@@ -17,11 +17,11 @@ interface WwwStackProps extends cdk.StackProps {
 }
 
 // WwwStack is an opionated stack for static websites.
-export class WwwStack extends cdk.Stack {
+export class StaticWebsiteStack extends cdk.Stack {
   public readonly subdomainBucket: s3.Bucket
   public readonly subdomainDistribution: cloudfront.CloudFrontWebDistribution
 
-  constructor(parent: cdk.App, name: string, props: WwwStackProps) {
+  constructor(parent: cdk.App, name: string, props: StaticWebsiteStackProps) {
     super(parent, name, props);
 
     this.subdomainBucket = this.createSubdomainBucket(props.subdomain, props.domain, props.logBucket)
@@ -34,19 +34,23 @@ export class WwwStack extends cdk.Stack {
       props.domain
     )
 
-    new route53.ARecord(this, "SubdomainRecordSet", {
+    new ARecord(this, 'SubdomainRecordSet', {
       zone: props.hostedZone,
       recordName: `${props.subdomain}.${props.domain}.`,
-      target: RecordTarget.fromValues(`${props.subdomain}.${props.domain}.`)
+      target: RecordTarget.fromAlias(
+        new CloudFrontTarget(this.subdomainDistribution)
+      )
     })
 
     if (props.redirectFromRoot && props.domainCertificate) {
       const rootBucket = this.createRootBucket(props.subdomain, props.domain, props.logBucket)
       const rootDist = this.createRootCloudFrontDist(rootBucket, props.domain, props.logBucket, props.domainCertificate)
-      new route53.ARecord(this, "RootRecordSet", {
+      new ARecord(this, "RootRecordSet", {
         zone: props.hostedZone,
         recordName: `${props.domain}.`,
-        target: RecordTarget.fromValues(rootDist.domainName)
+        target: RecordTarget.fromAlias(
+          new CloudFrontTarget(rootDist)
+        )
       })
     }
   }
@@ -150,12 +154,12 @@ export class WwwStack extends cdk.Stack {
       // e.g. naked domain + https redirects to www.domain.com/index.html which isn't quite right.
       defaultRootObject: "",
       // Using a custom origin config because we need to point to the S3 website URL not the regular bucket URL.
-      // I need to use the S3 website url because only that URL supports redirects. S3 static websites are 
+      // I need to use the S3 website url because only that URL supports redirects. S3 static websites are
       // HTTP only, hence using HTTPOnly.
       originConfigs: [
         {
           customOriginSource: {
-            domainName: source.bucketWebsiteUrl,
+            domainName: source.bucketWebsiteDomainName,
             originProtocolPolicy: OriginProtocolPolicy.HTTP_ONLY
           },
           behaviors: [

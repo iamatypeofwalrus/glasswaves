@@ -8,6 +8,7 @@ import { Duration } from '@aws-cdk/core';
 export class BaseStack extends cdk.Stack {
   public readonly nakedCert: ICertificate
   public readonly wwwCert: ICertificate
+  public readonly blogCert: ICertificate
   public readonly logBucket: s3.Bucket
   public readonly hostedZone: route53.HostedZone
 
@@ -25,6 +26,12 @@ export class BaseStack extends cdk.Stack {
       this,
       "WwwCert",
       "arn:aws:acm:us-east-1:081732485147:certificate/e80303e9-4af7-460a-bd04-1d92ef5b013e"
+    )
+
+    this.blogCert = Certificate.fromCertificateArn(
+      this,
+      "BlogCert",
+      "arn:aws:acm:us-east-1:081732485147:certificate/3b6b6e43-6f31-4421-9645-81ea2bf2e31b"
     )
 
     // S3

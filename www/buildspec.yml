@@ -6,6 +6,6 @@ phases:
       - echo Hello, world!
   post_build:
     commands:
-    - aws s3 sync www/src/ s3://glasswaves-co-www-subdomainbucket86d45e8f-1wfmkdmokwj1p --delete
+    - aws s3 sync www/src/ s3://glasswaves-co-www-subdomainbucket86d45e8f-1i4zlpu0znz1d --delete
     - aws configure set preview.cloudfront true # not sure this line is needed anymore
-    - aws cloudfront create-invalidation --distribution-id E1D5NVFADA98AR --paths "/*"
+    - aws cloudfront create-invalidation --distribution-id E2MOATU1FTM843  --paths "/*"

@@ -15,14 +15,13 @@ phases:
   pre_build:
     commands:
     - echo Hugo Config
-    - cat config.yaml
+    - cat blog/tconfig.yaml
     - echo Pulling themes
     - git submodule update --init --recursive
   build:
     commands:
-    - hugo -v
+    - hugo -v -s blog/
   post_build:
     commands:
     - echo Deploying to S3
-    - hugo deploy
-
+    - hugo deploy -v -s blog/

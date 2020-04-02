@@ -1,9 +1,11 @@
 ---
+# TODO bucket and cloudfront ID should be provided via environment variables
 version: 0.2
 phases:
   build:
     commands:
-      - echo Hello, world!
+      - echo $S3_BUCKET_NAME
+      - echo $CLOUDFRONT_ID
   post_build:
     commands:
     - aws s3 sync www/src/ s3://glasswaves-co-www-subdomainbucket86d45e8f-1i4zlpu0znz1d --delete

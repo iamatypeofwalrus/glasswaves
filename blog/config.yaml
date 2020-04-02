@@ -1,6 +1,6 @@
 baseURL: "http://glasswaves.co/"
 languageCode: "en-us"
-title: "Glasswaves Co"
+title: "Glasswaves Co."
 theme: "noteworthy"
 
 deployment:

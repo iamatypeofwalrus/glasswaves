@@ -18,8 +18,8 @@ phases:
     - cat blog/config.yaml
   build:
     commands:
-    - hugo -v -s blog/
+    - hugo -verbose --source blog/
   post_build:
     commands:
     - echo Deploying to S3
-    - hugo deploy -v -s blog/
+    - hugo deploy --invalidateCDN --verbose --source blog/ --maxDeletes -1

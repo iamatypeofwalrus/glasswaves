@@ -16,8 +16,6 @@ phases:
     commands:
     - echo Hugo Config
     - cat blog/config.yaml
-    - echo Pulling themes
-    - git submodule update --init --recursive
   build:
     commands:
     - hugo -v -s blog/

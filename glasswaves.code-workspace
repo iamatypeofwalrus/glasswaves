@@ -1,0 +1,13 @@
+{
+	"folders": [
+		{
+			"path": "infrastructure"
+		},
+		{
+			"path": "www"
+		},
+		{
+			"path": "blog"
+		}
+	]
+}

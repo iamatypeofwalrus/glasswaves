@@ -9,6 +9,9 @@ deployment:
     URL: "s3://glasswaves-co-blog-subdomainbucket86d45e8f-1pjpifrelsfsv"
     cloudFrontDistributionID: "E1AMXLUW18V92A"
 
+staticDir:
+- content/posts/assets
+
 params:
   twitter: "https://twitter.com/iamsomewalrus"
   linkedin: "https://www.linkedin.com/in/joseph-feeney/"

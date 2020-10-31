@@ -9,6 +9,7 @@ Noteworthy is a minimalist Hugo theme for writers and bloggers.
 
 * Fully responsive
 * Google Analytics and Disqus integration
+* Ko-fi donation button
 * Syntax highlighting
 * Mathematical notations with KaTex
 * About, Tags, and Archives pages
@@ -27,6 +28,32 @@ git clone https://github.com/kimcc/hugo-theme-noteworthy.git themes/noteworthy
 
 Refer to the [Hugo docs](https://gohugo.io/getting-started/quick-start/) for more information.
 
+## Image shortcode for large images
+
+To add images using the resize-image shortcode included with this theme, you will need to create a [Post Bundle](https://gohugo.io/content-management/organization/#page-bundles). Create a folder for your post, put your Markdown file and images inside, and rename your Markdown file `index.md`. For example: 
+
+```
+my-new-post
+- index.md
+- image1.jpg
+- image2.png
+```
+
+Then, you can add an image within your Markdown file by using the shortcode like this:
+
+```
+{{< resize-image src="image1.jpg" alt="My first image" >}}
+```
+
+Add captions like this: 
+
+```
+{{< resize-image src="image2.png" alt="My second image" caption="My caption" >}}
+```
+
+## Read more link for posts
+
+Set `showReadMore = false` to `true` in the config file to have a "read more" link show up when posts are truncated.
 
 ## Social media accounts
 
@@ -42,6 +69,7 @@ tumblr = "#"
 reddit = "#"
 pinterest = "#"
 youtube = "#"
+vimeo = "#"
 weibo = "#"
 vk = "#"
 linkedin = "#"
@@ -57,11 +85,19 @@ behance = "#"
 deviantart = "#"
 flickr = "#"
 
+# Audio & Music
+soundcloud = "#"
+
 # Programming
 github = "#"
 stackoverflow = "#"
 gitlab = "#"
 codepen = "#"
+
+# Academic
+googlescholar = "#"
+impactstory = "#"
+orcid = "#"  
 ```
 
 
@@ -75,6 +111,16 @@ disqusShortname = ""
 
 # Add your Google Analytics identifier: UA-XXXXXXXX-X
 googleAnalytics = "" 
+```
+
+## Ko-fi donation button
+
+If you'd like to enable a Ko-fi button on your posts, enable it in the config file and add your identifier.
+
+```
+# Set enableKofi to true to enable the Ko-fi support button. Add your Ko-fi ID to link to your account.
+enableKofi = true
+kofi = ""
 ```
 
 

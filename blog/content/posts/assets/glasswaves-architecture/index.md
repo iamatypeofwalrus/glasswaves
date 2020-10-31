@@ -1,8 +1,9 @@
 ---
-title: "A Static Website by Any Other Name”
-date: 2020-04-12T17:05:00-07:00
+title: "A Static Website by Any Other Name"
+date: 2020-10-31T15:23:11-07:00
 draft: false
 ---
+
 ## Glasswaves
 Programmers are familiar with the truism that naming things is hard. Choosing a DNS name doubly so. The moniker “Glasswaves” occurred to me while toiling away in a lab at the Salk Institute, itself perched on the cliffs of La Jolla over looking Black’s Beach. Glasswaves for me evokes a Californian dream of surfing emerald green waves in twilight. It’s most important property, however, is that it’s unlikely to cause me embarrassment on my deathbed[^1].
 
@@ -11,7 +12,7 @@ Over the years this website has been hosted on a variety of different services: 
 I’m an engineer at Amazon so it shouldn’t be a surprise to anyone that my cloud toolkit of choice is AWS. S3 is the right tradeoff for me. AWS engineers are the ones holding the pager, not me. Every service in the hot path of a HTTP request is web scale. (Do people still say that?)
 
 ## How it works
-![static website architecture](/www-static-website-architecture.png)
+{{< resize-image src="www-static-website-architecture.png" alt="WWW Static Website Architecture" >}}
 
 I like this architecture because it’s serverless. My contract begins and ends at well formatted HTML. Yearly domain name registrations are automatic. I don’t even have to rotate a TLS cert.
 

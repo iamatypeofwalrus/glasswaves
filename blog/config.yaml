@@ -11,6 +11,7 @@ deployment:
 
 staticDir:
 - content/posts/assets
+- static/
 
 params:
   twitter: "https://twitter.com/iamsomewalrus"

@@ -121,16 +121,17 @@ export class StaticWebsiteStack extends cdk.Stack {
       ],
       originConfigs: [
         {
-          s3OriginSource: {
-            s3BucketSource: source
+          customOriginSource: {
+            domainName: source.bucketWebsiteDomainName,
+            originProtocolPolicy: OriginProtocolPolicy.HTTP_ONLY
           },
           behaviors: [
             {
-              compress: true,
-              isDefaultBehavior: true
+              isDefaultBehavior: true,
+              compress: true
             }
           ]
-        }
+        },
       ],
       loggingConfig: {
         bucket: logBucket,

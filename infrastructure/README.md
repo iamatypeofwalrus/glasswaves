@@ -4,6 +4,12 @@
 * Github personal access Oath token stored in Secrets Manager in us-west-2
 
 ## Development
+### Setup
+Install:
+```
+npm install
+```
+
 ### Add a new CDK library
 e.g.
 ```sh
@@ -18,6 +24,9 @@ npm install --save @aws-cdk/aws-route53-targets@1.1.0
 
 ### Deploy a single stack
 `cdk deploy glasswaves-co-www`
+
+### Deploy blog stack
+`cdk deploy glasswaves-co-www-deploy`
 
 ## Developing
 ### Useful commands

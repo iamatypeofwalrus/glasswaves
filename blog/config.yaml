@@ -1,7 +1,7 @@
 baseURL: "https://blog.glasswaves.co/"
 languageCode: "en-us"
-title: "Glasswaves Co."
-theme: "noteworthy"
+title: "Blog for Glasswaves Co."
+theme: "smol"
 
 deployment:
   targets:
@@ -14,6 +14,19 @@ staticDir:
 - static/
 
 params:
-  twitter: "https://twitter.com/iamsomewalrus"
-  linkedin: "https://www.linkedin.com/in/joseph-feeney/"
-  github: "https://github.com/iamatypeofwalrus"
+  subtitle: "complexity from simplicity"
+
+menu:
+  main:
+    - identifier: "posts"
+      name: "Posts"
+      url: "/posts/"
+      weight: 1 
+    - identifier: "tags"
+      name: "Tags"
+      url: "/tags/"
+      weight: 3
+    - identifier: "about"
+      name: "About"
+      url: "https://glasswaves.co"
+      weight: 4

@@ -8,7 +8,7 @@ draft: false
 ## Glasswaves
 Programmers are familiar with the truism that naming things is hard. The name “Glasswaves” occurred to me when I was working at the Salk Institute which is perched on the cliffs of La Jolla. Not a bad view. Glasswaves for me evokes twilight sessions surfing the emerald green waves of Black’s Beach. The most important property of “Glasswaves”, however, is that it’s a name that’s unlikely to cause me embarrassment in the future. The screen names I chose as a kid have not aged gracefully[^1].
 
-## How it works
+## Architecture
 Over the years this website has been hosted on a variety of different services: on a Digital Ocean droplet, Tutum (an infrastructure provider that ran Docker containers), Firebase, Google Cloud, and, for the last few years, as a static website hosted by Amazon’s Simple Storage Service (S3).
 It shouldn’t be a surprise to anyone that my cloud toolkit of choice is AWS. I’m ~~an engineer~~ a software manager at Amazon after all.
 

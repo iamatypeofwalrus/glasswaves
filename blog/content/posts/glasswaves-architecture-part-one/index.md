@@ -1,11 +1,12 @@
 ---
 title: "A Static Website by Any Other Name"
+tags: ['meta', 'architecture', 'serverless']
 date: 2020-10-31T15:23:11-07:00
 draft: false
 ---
 
 ## Glasswaves
-Programmers are familiar with the truism that naming things is hard. The name “Glasswaves” occurred to me when I was working at the Salk Institute which is perched on the cliffs of La Jolla. Not a bad view. Glasswaves for me evokes twilight sessions surfing the emerald green waves of Black’s Beach. The most important property of “Glasswaves”, however, is that it’s a name that’s unlikely to cause me embarrassment in the future. The screen names we chose as kids don’t age gracefully[^1].
+Programmers are familiar with the truism that naming things is hard. The name “Glasswaves” occurred to me when I was working at the Salk Institute which is perched on the cliffs of La Jolla. Not a bad view. Glasswaves for me evokes twilight sessions surfing the emerald green waves of Black’s Beach. The most important property of “Glasswaves”, however, is that it’s a name that’s unlikely to cause me embarrassment in the future. The screen names I chose as a kid have not aged gracefully[^1].
 
 ## How it works
 Over the years this website has been hosted on a variety of different services: on a Digital Ocean droplet, Tutum (an infrastructure provider that ran Docker containers), Firebase, Google Cloud, and, for the last few years, as a static website hosted by Amazon’s Simple Storage Service (S3).

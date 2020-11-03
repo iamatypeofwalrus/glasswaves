@@ -1,6 +1,6 @@
 baseURL: "https://blog.glasswaves.co/"
 languageCode: "en-us"
-title: "Blog for Glasswaves Co."
+title: "complexity from simplicity"
 theme: "smol"
 
 deployment:
@@ -14,7 +14,6 @@ staticDir:
 - static/
 
 params:
-  subtitle: "complexity from simplicity"
 
 menu:
   main:

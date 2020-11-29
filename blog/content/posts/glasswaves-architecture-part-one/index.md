@@ -1,5 +1,5 @@
 ---
-title: "A Static Website by Any Other Name"
+title: "🤓 A Static Website by Any Other Name"
 tags: ['meta', 'architecture', 'serverless']
 date: 2020-10-31T15:23:11-07:00
 draft: false

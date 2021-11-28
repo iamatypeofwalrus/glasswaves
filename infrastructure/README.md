@@ -29,6 +29,12 @@ npm install --save @aws-cdk/aws-route53-targets@1.1.0
 `cdk deploy glasswaves-co-www-deploy`
 
 ## Developing
+### Code space
+* Vscode - `Tasks: Run Build Command` - NPM  Watch - Infrastructure
+    * watches files for changes in the background
+* `npx cdk` <- run CDK command
+    * TODO - add alias to this in the env
+
 ### Useful commands
 * `npm run build`   compile typescript to js
 * `npm run watch`   watch for changes and compile

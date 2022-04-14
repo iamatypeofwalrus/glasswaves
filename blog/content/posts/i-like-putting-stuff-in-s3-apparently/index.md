@@ -1,7 +1,7 @@
 ---
 title:  "🔗 I like putting stuff in S3 apparently"
 tags: []
-date: 2022-04-14T20:04+00:00
+date: 2022-04-14T13:04:00-07:00
 draft: false
 ---
 

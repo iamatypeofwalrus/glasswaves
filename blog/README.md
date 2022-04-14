@@ -12,3 +12,7 @@ From the top of `blog/`
 
 ### With Apple Shortcuts
 TK
+
+## TODOs
+* pings when a new blog post has been officially released via RSS
+* create a tweet when there's a new blog post

@@ -1,14 +1,13 @@
-import cdk = require('@aws-cdk/core');
-import { BuildSpec, PipelineProject } from '@aws-cdk/aws-codebuild';
-import { Artifact, Pipeline } from '@aws-cdk/aws-codepipeline';
-import { CodeBuildAction, GitHubSourceAction } from '@aws-cdk/aws-codepipeline-actions';
-import { PolicyStatement, Role, ServicePrincipal } from '@aws-cdk/aws-iam';
-import { Bucket } from '@aws-cdk/aws-s3';
-import { SecretValue } from '@aws-cdk/core';
-import codebuild = require('@aws-cdk/aws-codebuild');
-import { CloudFrontWebDistribution } from '@aws-cdk/aws-cloudfront';
+import { App, Stack, StackProps, SecretValue } from 'aws-cdk-lib';
+import { BuildSpec, PipelineProject } from 'aws-cdk-lib/aws-codebuild';
+import { Artifact, Pipeline } from 'aws-cdk-lib/aws-codepipeline';
+import { CodeBuildAction, GitHubSourceAction } from 'aws-cdk-lib/aws-codepipeline-actions';
+import { PolicyStatement, Role, ServicePrincipal } from 'aws-cdk-lib/aws-iam';
+import { Bucket } from 'aws-cdk-lib/aws-s3';
+import { aws_codebuild as codebuild } from 'aws-cdk-lib';
+import { CloudFrontWebDistribution } from 'aws-cdk-lib/aws-cloudfront';
 
-interface DeployStaticWebsiteStackProps extends cdk.StackProps {
+interface DeployStaticWebsiteStackProps extends StackProps {
   staticBucket: Bucket
   cloudfrontDist: CloudFrontWebDistribution
   githubSourceProps: GithubSourceProps
@@ -26,8 +25,8 @@ interface GithubSourceProps {
 // * Build those changes
 //
 // The BuildRole has permissions to CRUD within the provided S3 bucket and create CloudFront invalidations
-export class DeployStaticWebsiteStack extends cdk.Stack {
-  constructor(parent: cdk.App, name: string, props: DeployStaticWebsiteStackProps) {
+export class DeployStaticWebsiteStack extends Stack {
+  constructor(parent: App, name: string, props: DeployStaticWebsiteStackProps) {
     super(parent, name, props);
 
     let buildRole = new Role(this, 'BuildRole', {
@@ -47,7 +46,8 @@ export class DeployStaticWebsiteStack extends cdk.Stack {
     const sourceBuild = new PipelineProject(this, 'StaticBuild', {
       environment: {
         computeType: codebuild.ComputeType.SMALL,
-        buildImage: codebuild.LinuxBuildImage.UBUNTU_14_04_NODEJS_8_11_0
+        // codebuild.LinuxBuildImage.UBUNTU_14_04_NODEJS_8_11_0 is deprecated
+        buildImage: codebuild.LinuxBuildImage.AMAZON_LINUX_2_4
       },
       buildSpec: BuildSpec.fromSourceFilename(props.githubSourceProps.buildSpecLocation),
       role: buildRole,

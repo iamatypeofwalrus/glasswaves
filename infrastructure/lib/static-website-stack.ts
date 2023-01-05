@@ -1,12 +1,12 @@
-import cdk = require('@aws-cdk/core');
-import s3 = require('@aws-cdk/aws-s3');
-import cloudfront = require('@aws-cdk/aws-cloudfront');
-import { ICertificate } from '@aws-cdk/aws-certificatemanager';
-import { OriginProtocolPolicy, ViewerProtocolPolicy } from '@aws-cdk/aws-cloudfront';
-import { ARecord, HostedZone, RecordTarget } from '@aws-cdk/aws-route53';
-import { CloudFrontTarget } from '@aws-cdk/aws-route53-targets';
+import { App, Stack, StackProps } from 'aws-cdk-lib';
+import { aws_s3 as s3 } from 'aws-cdk-lib';
+import { aws_cloudfront as cloudfront } from 'aws-cdk-lib';
+import { ICertificate } from 'aws-cdk-lib/aws-certificatemanager';
+import { OriginProtocolPolicy, ViewerCertificate, ViewerProtocolPolicy } from 'aws-cdk-lib/aws-cloudfront';
+import { ARecord, HostedZone, RecordTarget } from 'aws-cdk-lib/aws-route53';
+import { CloudFrontTarget } from 'aws-cdk-lib/aws-route53-targets';
 
-interface StaticWebsiteStackProps extends cdk.StackProps {
+interface StaticWebsiteStackProps extends StackProps {
   domain: string; // e.g. glasswaves.co
   subdomain: string; // e.g. www
   hostedZone: HostedZone;
@@ -17,11 +17,11 @@ interface StaticWebsiteStackProps extends cdk.StackProps {
 }
 
 // WwwStack is an opionated stack for static websites.
-export class StaticWebsiteStack extends cdk.Stack {
+export class StaticWebsiteStack extends Stack {
   public readonly subdomainBucket: s3.Bucket
   public readonly subdomainDistribution: cloudfront.CloudFrontWebDistribution
 
-  constructor(parent: cdk.App, name: string, props: StaticWebsiteStackProps) {
+  constructor(parent: App, name: string, props: StaticWebsiteStackProps) {
     super(parent, name, props);
 
     this.subdomainBucket = this.createSubdomainBucket(props.subdomain, props.domain, props.logBucket)
@@ -99,12 +99,10 @@ export class StaticWebsiteStack extends cdk.Stack {
     return new cloudfront.CloudFrontWebDistribution(this, 'SubdomainDistribution', {
       comment: "Distribution pointing to the subdomain bucket",
       priceClass: cloudfront.PriceClass.PRICE_CLASS_ALL,
-      aliasConfiguration: {
-        acmCertRef: certificate.certificateArn,
-        names: [
-          `${subdomain}.${domain}`
-        ]
-      },
+      viewerCertificate: cloudfront.ViewerCertificate.fromAcmCertificate(
+        certificate,
+        { aliases: [`${subdomain}.${domain}`] }
+      ),
       errorConfigurations: [
         {
           errorCode: 404,
@@ -145,12 +143,7 @@ export class StaticWebsiteStack extends cdk.Stack {
       comment: `Distributions pointing to the root bucket of ${domain}`,
       priceClass: cloudfront.PriceClass.PRICE_CLASS_ALL,
       viewerProtocolPolicy: ViewerProtocolPolicy.ALLOW_ALL,
-      aliasConfiguration: {
-        acmCertRef: certificate.certificateArn,
-        names: [
-          domain
-        ]
-      },
+      viewerCertificate: ViewerCertificate.fromAcmCertificate(certificate, {aliases:[domain]}),
       // the default for defaultRootObject is index.html which causes issues with the redirect bucket.
       // e.g. naked domain + https redirects to www.domain.com/index.html which isn't quite right.
       defaultRootObject: "",

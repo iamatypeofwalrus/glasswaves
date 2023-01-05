@@ -1,38 +1,17 @@
-import cdk = require('@aws-cdk/core');
-import { Certificate, ICertificate } from '@aws-cdk/aws-certificatemanager';
-import s3 = require('@aws-cdk/aws-s3');
-import route53 = require('@aws-cdk/aws-route53');
-import { Duration } from '@aws-cdk/core';
+import { App, StackProps, Duration, Stack } from 'aws-cdk-lib';
+import { aws_certificatemanager as acm } from 'aws-cdk-lib';
+import { aws_s3 as s3 } from 'aws-cdk-lib';
+import { aws_route53 as route53 } from 'aws-cdk-lib';
 
 // Base Stack provides a base amount of infrastructure in order to support hosting many projects under the Glasswaves domain
-export class BaseStack extends cdk.Stack {
-  public readonly nakedCert: ICertificate
-  public readonly wwwCert: ICertificate
-  public readonly blogCert: ICertificate
+export class BaseStack extends Stack {
+  public readonly nakedCert: acm.ICertificate
+  public readonly wildcardCert: acm.ICertificate
   public readonly logBucket: s3.Bucket
   public readonly hostedZone: route53.HostedZone
 
-  constructor(parent: cdk.App, name: string, props?: cdk.StackProps) {
+  constructor(parent: App, name: string, props?: StackProps) {
     super(parent, name, props)
-
-    // ACM imports
-    this.nakedCert = Certificate.fromCertificateArn(
-      this,
-      'NakedCert',
-      "arn:aws:acm:us-east-1:081732485147:certificate/74db1213-0ee8-4b62-be87-c73785779640"
-    )
-
-    this.wwwCert = Certificate.fromCertificateArn(
-      this,
-      "WwwCert",
-      "arn:aws:acm:us-east-1:081732485147:certificate/e80303e9-4af7-460a-bd04-1d92ef5b013e"
-    )
-
-    this.blogCert = Certificate.fromCertificateArn(
-      this,
-      "BlogCert",
-      "arn:aws:acm:us-east-1:081732485147:certificate/3b6b6e43-6f31-4421-9645-81ea2bf2e31b"
-    )
 
     // S3
     const log = new s3.Bucket(this, 'LogsBucket')
@@ -69,13 +48,17 @@ export class BaseStack extends cdk.Stack {
       ]
     })
 
-    new route53.TxtRecord(this, "AcmeChallenge", {
-      zone: this.hostedZone,
-      recordName: "_acme-challenge.www.glasswaves.co.",
-      ttl: Duration.minutes(5),
-      values: [
-        "6c2kZv5YX27S4lsIV0KtylCEC2zsT27GhyFAfi17_Oc"
-      ]
+    // ACM DNS Validated and Cross region :-)
+    this.wildcardCert = new acm.DnsValidatedCertificate(this, "GlasswavesWildcardCertificate", {
+      domainName: '*.glasswaves.co',
+      hostedZone: this.hostedZone,
+      region: 'us-east-1'
+    })
+
+    this.nakedCert = new acm.DnsValidatedCertificate(this, "GlasswavesNakedCertV2", {
+      domainName: "glasswaves.co",
+      hostedZone: this.hostedZone,
+      region: 'us-east-1'
     })
   }
 }

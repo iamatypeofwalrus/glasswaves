@@ -1,13 +1,10 @@
 #!/usr/bin/env node
-import cdk = require('@aws-cdk/core')
-import { CertsStack } from '../lib/certs-stack'
+import { App } from 'aws-cdk-lib';
 import { StaticWebsiteStack } from '../lib/static-website-stack'
 import { DeployStaticWebsiteStack } from '../lib/deploy-static-website-stack'
 import { BaseStack } from '../lib/base-stack'
 
-const app = new cdk.App()
-
-new CertsStack(app, "glasswaves-co-certs", {env: {region: "us-east-1"}})
+const app = new App()
 
 const base = new BaseStack(app, "glasswaves-co")
 
@@ -16,7 +13,7 @@ const www = new StaticWebsiteStack(app, "glasswaves-co-www", {
   subdomain: "www",
   redirectFromRoot: true,
   hostedZone: base.hostedZone,
-  subdomainCertificate: base.wwwCert,
+  subdomainCertificate: base.wildcardCert,
   domainCertificate: base.nakedCert,
   logBucket: base.logBucket
 })

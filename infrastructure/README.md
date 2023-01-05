@@ -1,8 +1,9 @@
 # Glasswaves Infrastructure
 ## TODO
-- [ ] Upgrade to CDK V2. [Link](https://docs.aws.amazon.com/cdk/v2/guide/migrating-v2.html)
-- [ ] Use DNS validation for ACN certificates
+- [x] Upgrade to CDK V2. [Link](https://docs.aws.amazon.com/cdk/v2/guide/migrating-v2.html)
+- [x] Use DNS validation for ACN certificates
   - explore using a * certificate on the root domain
+- [ ] Re-add blog.glasswaves.co
 
 ## Prequisites
 * Github personal access Oath token stored in Secrets Manager in us-west-2

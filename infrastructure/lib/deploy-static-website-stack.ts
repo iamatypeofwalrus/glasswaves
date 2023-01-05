@@ -46,8 +46,9 @@ export class DeployStaticWebsiteStack extends Stack {
     const sourceBuild = new PipelineProject(this, 'StaticBuild', {
       environment: {
         computeType: codebuild.ComputeType.SMALL,
-        // codebuild.LinuxBuildImage.UBUNTU_14_04_NODEJS_8_11_0 is deprecated
-        buildImage: codebuild.LinuxBuildImage.AMAZON_LINUX_2_4
+        // codebuild.LinuxBuildImage.UBUNTU_14_04_NODEJS_8_11_0 is deprecated per documentation using STANDARD_2_0
+        // https://docs.aws.amazon.com/cdk/api/v1/docs/@aws-cdk_aws-codebuild.LinuxBuildImage.html#static-ubuntu_14_04_nodejs_8_11_0span-classapi-icon-api-icon-deprecated-titlethis-api-element-is-deprecated-its-use-is-not-recommended%EF%B8%8Fspan
+        buildImage: codebuild.LinuxBuildImage.STANDARD_2_0 //
       },
       buildSpec: BuildSpec.fromSourceFilename(props.githubSourceProps.buildSpecLocation),
       role: buildRole,
